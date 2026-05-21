@@ -174,8 +174,8 @@ export function HomePage() {
         {!loadingLots && filtered.length === 0 && (
           <div className="text-center py-16">
             <div className="text-5xl mb-3">🌿</div>
-            <p className="text-gray-500 font-medium">Нет продуктов в этой категории</p>
-            <p className="text-gray-400 text-sm mt-1">Попробуйте другой фильтр</p>
+            <p className="text-gray-500 font-medium">Скоро здесь появятся новые предложения</p>
+            <p className="text-gray-400 text-sm mt-1">Следите за обновлениями</p>
           </div>
         )}
 

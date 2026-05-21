@@ -47,8 +47,8 @@ export function OrdersPage() {
       <Layout>
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-8 text-center">
           <div className="text-6xl mb-4">🛒</div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Войдите в аккаунт</h2>
-          <p className="text-gray-500 text-sm mb-6">Чтобы видеть свои заказы</p>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Совместные закупки натуральных продуктов</h2>
+          <p className="text-gray-500 text-sm mb-6">Объединяйтесь с другими покупателями и заказывайте выгоднее</p>
           <button onClick={() => navigate('/login')}
             className="bg-green-600 text-white font-bold px-8 py-3 rounded-2xl active:scale-95 transition-transform">
             Войти

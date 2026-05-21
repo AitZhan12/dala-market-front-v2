@@ -159,18 +159,30 @@ export function RegisterPage() {
 
             <Field label="Ваше имя">
               <input type="text" value={name} onChange={e => setName(e.target.value)}
-                placeholder={role === 'FARMER' ? 'Асан Сейткали' : 'Алия Бекова'}
-                required className="input-field" />
+                placeholder="Введите имя"
+                required className="input-field"
+                onInvalid={e => e.currentTarget.setCustomValidity('Пожалуйста, введите ваше имя')}
+                onInput={e => e.currentTarget.setCustomValidity('')} />
             </Field>
 
             <Field label="Email">
               <input type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder="example@mail.com" required className="input-field" />
+                placeholder="Введите email" required className="input-field"
+                onInvalid={e => {
+                  const t = e.currentTarget;
+                  t.setCustomValidity(t.value === '' ? 'Введите email — он нужен для входа' : 'Введите корректный email, например: name@mail.com');
+                }}
+                onInput={e => e.currentTarget.setCustomValidity('')} />
             </Field>
 
             <Field label="Пароль">
               <input type="password" value={password} onChange={e => setPassword(e.target.value)}
-                placeholder="Минимум 6 символов" minLength={6} required className="input-field" />
+                placeholder="Минимум 6 символов" minLength={6} required className="input-field"
+                onInvalid={e => {
+                  const t = e.currentTarget;
+                  t.setCustomValidity(t.value === '' ? 'Придумайте пароль для аккаунта' : 'Пароль должен быть не короче 6 символов');
+                }}
+                onInput={e => e.currentTarget.setCustomValidity('')} />
             </Field>
 
             {/* Farmer-only fields */}

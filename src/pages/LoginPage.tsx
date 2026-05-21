@@ -46,9 +46,14 @@ export function LoginPage() {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              placeholder="example@mail.com"
+              placeholder="Введите email"
               className="w-full border border-gray-200 rounded-xl px-4 py-3.5 text-gray-800 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 transition"
               required
+              onInvalid={e => {
+                const t = e.currentTarget;
+                t.setCustomValidity(t.value === '' ? 'Введите email от вашего аккаунта' : 'Введите корректный email, например: name@mail.com');
+              }}
+              onInput={e => e.currentTarget.setCustomValidity('')}
             />
           </div>
 
@@ -59,9 +64,11 @@ export function LoginPage() {
                 type={showPass ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
+                placeholder="Введите пароль"
                 className="w-full border border-gray-200 rounded-xl px-4 py-3.5 pr-12 text-gray-800 outline-none focus:border-green-500 focus:ring-2 focus:ring-green-100 transition"
                 required
+                onInvalid={e => e.currentTarget.setCustomValidity('Введите пароль от вашего аккаунта')}
+                onInput={e => e.currentTarget.setCustomValidity('')}
               />
               <button
                 type="button"
