@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { Logo } from '../components/Logo';
+import { TelegramLoginButton } from '../components/TelegramLoginButton';
 import { useAuth } from '../context/AuthContext';
 
 export function LoginPage() {
@@ -101,15 +102,7 @@ export function LoginPage() {
           <div className="flex-1 h-px bg-gray-100" />
         </div>
 
-        <button
-          onClick={() => alert('Telegram Login Widget — подключается через бот')}
-          className="w-full bg-[#229ED9] active:bg-[#1a8fc0] text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2.5 transition-all active:scale-95"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="white">
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.41 14.717l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.738.842z"/>
-          </svg>
-          Войти через Telegram
-        </button>
+        <TelegramLoginButton />
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Нет аккаунта?{' '}

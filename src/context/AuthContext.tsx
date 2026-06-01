@@ -7,6 +7,7 @@ interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginTelegram: (payload: Record<string, unknown>) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   updateUser: (updates: Partial<User>) => void;
@@ -88,6 +89,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     persist(mapAuthResponse(data), data.token);
   }, []);
 
+  const loginTelegram = useCallback(async (payload: Record<string, unknown>) => {
+    const data = await authApi.telegramWidget(payload);
+    persist(mapAuthResponse(data), data.token);
+  }, []);
+
   const register = useCallback(async (name: string, email: string, password: string) => {
     const data = await authApi.register(name, email, password);
     persist(mapAuthResponse(data), data.token);
@@ -127,7 +133,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user, updateUser]);
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, register, logout, updateUser, refreshMe }}>
+    <AuthContext.Provider value={{ user, token, isLoading, login, loginTelegram, register, logout, updateUser, refreshMe }}>
       {children}
     </AuthContext.Provider>
   );
