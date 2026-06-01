@@ -53,12 +53,12 @@ export function RegisterPage() {
       }
 
       await register(name, email, password);
-      const [complexData, codeData] = await Promise.all([
+      const [complexData, codeResult] = await Promise.allSettled([
         complexesApi.getAll(),
         authApi.getVerifyCode(),
       ]);
-      setComplexes(complexData);
-      setVerifyCode(codeData.code);
+      if (complexData.status === 'fulfilled') setComplexes(complexData.value);
+      if (codeResult.status === 'fulfilled') setVerifyCode(codeResult.value.code);
       setStep('telegram');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
@@ -235,15 +235,32 @@ export function RegisterPage() {
                 Откройте бот и отправьте этот код, чтобы мы зафиксировали ваш номер.
               </p>
 
-              {verifyCode && (
+              {verifyCode ? (
                 <div className="bg-white rounded-xl border border-blue-200 py-3 px-6 mb-4 inline-block">
                   <p className="text-xs text-gray-400 mb-1">Ваш код</p>
                   <p className="text-3xl font-black text-gray-900 tracking-widest">{verifyCode}</p>
                 </div>
+              ) : (
+                <button
+                  onClick={async () => {
+                    try {
+                      const d = await authApi.getVerifyCode();
+                      setVerifyCode(d.code);
+                    } catch (e: unknown) {
+                      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error;
+                      setError(msg || 'Не удалось получить код');
+                    }
+                  }}
+                  className="mb-4 bg-white border border-blue-200 text-blue-600 font-semibold py-2 px-4 rounded-xl"
+                >
+                  Запросить код
+                </button>
               )}
 
               <button
-                onClick={() => alert(`Отправьте код ${verifyCode} нашему Telegram боту`)}
+                onClick={() => verifyCode
+                  ? alert(`Отправьте код ${verifyCode} нашему Telegram боту`)
+                  : alert('Сначала запросите код')}
                 className="w-full bg-[#229ED9] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
