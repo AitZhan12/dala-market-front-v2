@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
 import { Logo } from '../components/Logo';
+import { TelegramVerify } from '../components/TelegramVerify';
 import { useAuth } from '../context/AuthContext';
 import { authApi, complexesApi } from '../services/api';
 import { Complex } from '../types';
@@ -27,6 +28,7 @@ export function RegisterPage() {
   const [farmDesc, setFarmDesc] = useState('');
 
   const [verifyCode, setVerifyCode] = useState('');
+  const [verified, setVerified] = useState(false);
   const [complexId, setComplexId] = useState<number | null>(null);
   const [complexes, setComplexes] = useState<Complex[]>([]);
   const [loading, setLoading] = useState(false);
@@ -65,6 +67,17 @@ export function RegisterPage() {
       setError(msg || 'Ошибка регистрации');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchCode() {
+    setError('');
+    try {
+      const d = await authApi.getVerifyCode();
+      setVerifyCode(d.code);
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error;
+      setError(msg || 'Не удалось получить код');
     }
   }
 
@@ -228,47 +241,34 @@ export function RegisterPage() {
               <p className="text-sm text-gray-500">Шаг 2 из {steps.length}</p>
             </div>
 
-            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-center">
-              <div className="text-4xl mb-3">📱</div>
-              <h3 className="font-bold text-gray-900 mb-2">Подтвердите через Telegram</h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Откройте бот и отправьте этот код, чтобы мы зафиксировали ваш номер.
-              </p>
-
-              {verifyCode ? (
-                <div className="bg-white rounded-xl border border-blue-200 py-3 px-6 mb-4 inline-block">
-                  <p className="text-xs text-gray-400 mb-1">Ваш код</p>
-                  <p className="text-3xl font-black text-gray-900 tracking-widest">{verifyCode}</p>
-                </div>
-              ) : (
-                <button
-                  onClick={async () => {
-                    try {
-                      const d = await authApi.getVerifyCode();
-                      setVerifyCode(d.code);
-                    } catch (e: unknown) {
-                      const msg = (e as { response?: { data?: { error?: string } } })?.response?.data?.error;
-                      setError(msg || 'Не удалось получить код');
-                    }
-                  }}
-                  className="mb-4 bg-white border border-blue-200 text-blue-600 font-semibold py-2 px-4 rounded-xl"
-                >
-                  Запросить код
+            {verified ? (
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
+                <CheckCircle2 size={48} className="text-green-500 mx-auto mb-3" />
+                <h3 className="font-bold text-gray-900 mb-1">Номер подтверждён!</h3>
+                <p className="text-sm text-gray-600 mb-5">Теперь выберите свой жилой комплекс</p>
+                <button onClick={handleSkipToComplex} disabled={loading}
+                  className="w-full bg-green-600 text-white font-bold py-3.5 rounded-2xl active:scale-95 transition-transform disabled:opacity-60">
+                  {loading ? 'Загрузка...' : 'Продолжить →'}
                 </button>
-              )}
-
-              <button
-                onClick={() => verifyCode
-                  ? alert(`Отправьте код ${verifyCode} нашему Telegram боту`)
-                  : alert('Сначала запросите код')}
-                className="w-full bg-[#229ED9] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                  <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L7.41 14.717l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.738.842z"/>
-                </svg>
-                Открыть Telegram бот
-              </button>
-            </div>
+              </div>
+            ) : verifyCode ? (
+              <TelegramVerify code={verifyCode} onVerified={() => setVerified(true)} />
+            ) : (
+              <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 text-center">
+                <div className="text-4xl mb-3">📱</div>
+                <h3 className="font-bold text-gray-900 mb-2">Подтвердите через Telegram</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Нужно один раз — чтобы фермеры доверяли заказам. Номер подставит сам Telegram.
+                </p>
+                {error && (
+                  <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3 mb-3">{error}</div>
+                )}
+                <button onClick={fetchCode}
+                  className="w-full bg-[#229ED9] text-white font-bold py-3.5 rounded-xl active:scale-95 transition-transform">
+                  Начать подтверждение
+                </button>
+              </div>
+            )}
 
             <div className="bg-amber-50 border border-amber-100 rounded-xl p-3">
               <p className="text-xs text-amber-700">
@@ -276,9 +276,11 @@ export function RegisterPage() {
               </p>
             </div>
 
-            <button onClick={handleSkipToComplex} className="w-full text-gray-400 text-sm py-2 active:text-gray-600">
-              Пропустить пока →
-            </button>
+            {!verified && (
+              <button onClick={handleSkipToComplex} className="w-full text-gray-400 text-sm py-2 active:text-gray-600">
+                Пропустить пока →
+              </button>
+            )}
           </div>
         )}
 

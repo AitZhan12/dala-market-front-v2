@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, ChevronRight, Shield, MapPin, Bell, HelpCircle, Settings } from 'lucide-react';
 import { Layout } from '../components/Layout';
 import { Logo } from '../components/Logo';
+import { TelegramVerify } from '../components/TelegramVerify';
 import { useAuth } from '../context/AuthContext';
 import { complexesApi, authApi } from '../services/api';
 import { Complex } from '../types';
@@ -111,30 +112,25 @@ export function ProfilePage() {
 
         {/* Верификация */}
         {!user.verified && (
-          <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
-            <div className="flex items-start gap-3">
-              <div className="text-2xl">⚠️</div>
-              <div className="flex-1">
-                <p className="font-bold text-amber-800 text-sm">Подтвердите номер телефона</p>
-                <p className="text-xs text-amber-700 mt-1">
-                  Для участия в закупках нужно верифицировать аккаунт через Telegram
-                </p>
-                {!verifyCode ? (
+          verifyCode ? (
+            <TelegramVerify code={verifyCode} onVerified={() => { refreshMe(); setVerifyCode(''); }} />
+          ) : (
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="text-2xl">⚠️</div>
+                <div className="flex-1">
+                  <p className="font-bold text-amber-800 text-sm">Подтвердите номер телефона</p>
+                  <p className="text-xs text-amber-700 mt-1">
+                    Для участия в закупках нужно верифицировать аккаунт через Telegram
+                  </p>
                   <button onClick={handleGetVerifyCode} disabled={loadingCode}
                     className="mt-2 bg-amber-500 text-white text-xs font-bold px-4 py-2 rounded-xl active:scale-95 disabled:opacity-60">
-                    {loadingCode ? 'Получаем...' : 'Получить код'}
+                    {loadingCode ? 'Получаем...' : 'Подтвердить через Telegram'}
                   </button>
-                ) : (
-                  <div className="mt-2">
-                    <p className="text-xs text-amber-700 mb-1">Отправьте этот код боту:</p>
-                    <div className="bg-white rounded-lg px-3 py-2 inline-block border border-amber-200">
-                      <span className="font-black text-xl tracking-widest text-gray-900">{verifyCode}</span>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
-          </div>
+          )
         )}
 
         {/* Admin panel */}
